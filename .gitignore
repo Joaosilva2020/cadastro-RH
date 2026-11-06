@@ -1,3 +1,10 @@
-sistema-rh-mysql/.env
-sistema-rh-mysql/node_modules/
-sistema-rh-mysql/.amplify-hosting/
+# Node.js
+**/node_modules/
+
+# Secrets and local configuration
+**/.env
+**/.env.*
+!**/.env.example
+
+# Amplify generated deployment bundle
+**/.amplify-hosting/
