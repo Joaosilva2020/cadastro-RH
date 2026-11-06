@@ -1,13 +1,18 @@
+cat > amplify.yml <<'YAML'
 version: 1
+
 frontend:
   phases:
     preBuild:
       commands:
         - cd sistema-rh-mysql && npm ci
+
     build:
       commands:
-        - cd sistema-rh-mysql && npm run amplify:bundle
+        - cd sistema-rh-mysql && bash bin/postbuild.sh
+
   artifacts:
     baseDirectory: sistema-rh-mysql/.amplify-hosting
     files:
       - '**/*'
+YAML
