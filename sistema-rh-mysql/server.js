@@ -31,6 +31,14 @@ const db = dbConfigMissing.length ? null : mysql.createPool({
   dateStrings: true
 });
 
+app.use("/api", (req, res, next) => {
+  if (db || req.path === "/health") return next();
+  res.status(503).json({
+    erro: "O MySQL ainda não está configurado no servidor.",
+    missing: dbConfigMissing
+  });
+});
+
 // Diagnóstico: separa falha do servidor de falha na conexão com o MySQL.
 app.get("/api/health", async (_req, res) => {
   if (!db) {

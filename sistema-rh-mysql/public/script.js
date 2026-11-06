@@ -170,6 +170,6 @@ $("btn-atualizar").addEventListener("click", async () => {
     await carregarFuncionarios();
     await carregarPagamentos();
   } catch (e) {
-    avisar("Não foi possível conectar. Confira a configuração do MySQL e execute database.sql.", "erro");
+    avisar(e.message || "Não foi possível conectar ao servidor.", "erro");
   }
 })();
