@@ -1,16 +1,18 @@
 version: 1
 
 frontend:
+  buildpath: sistema-rh-mysql
+
   phases:
     preBuild:
       commands:
-        - cd sistema-rh-mysql && npm ci
+        - npm ci
 
     build:
       commands:
-        - cd sistema-rh-mysql && bash bin/postbuild.sh
+        - bash bin/postbuild.sh
 
   artifacts:
-    baseDirectory: sistema-rh-mysql/.amplify-hosting
+    baseDirectory: .amplify-hosting
     files:
       - '**/*'
