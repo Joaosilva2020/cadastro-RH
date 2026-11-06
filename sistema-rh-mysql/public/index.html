@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de RH</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <header class="topo">
+      <div>
+        <span class="tag">BANCO DE DADOS • MYSQL</span>
+        <h1>Sistema de Recursos Humanos</h1>
+        <p>Cadastro de funcionários e registro de bônus.</p>
+      </div>
+      <div class="marca">RH</div>
+    </header>
+
+    <section class="painel">
+      <h2 id="titulo-form">Cadastrar funcionário</h2>
+      <form id="form-funcionario">
+        <input type="hidden" id="id-funcionario">
+        <div class="campos">
+          <label>Nome do funcionário *
+            <input id="nome" maxlength="150" placeholder="Ex.: Ana Souza" required>
+          </label>
+          <label>Cargo *
+            <input id="cargo" maxlength="100" placeholder="Ex.: Analista" required>
+          </label>
+          <label>Salário (R$) *
+            <input id="salario" type="number" min="0.01" step="0.01" placeholder="3000.00" required>
+          </label>
+          <label>Data de admissão *
+            <input id="data-admissao" type="date" required>
+          </label>
+          <label>Departamento *
+            <select id="departamento" required><option value="">Carregando...</option></select>
+          </label>
+        </div>
+        <div class="acoes">
+          <button type="submit" id="btn-salvar">Cadastrar funcionário</button>
+          <button type="button" id="btn-cancelar" class="secundario oculto">Cancelar edição</button>
+        </div>
+      </form>
+      <p id="mensagem" role="status"></p>
+    </section>
+
+    <section class="painel">
+      <div class="cabecalho-lista">
+        <div><h2>Funcionários cadastrados</h2><p>O bônus previsto é calculado pela FUNCTION.</p></div>
+        <button id="btn-atualizar" type="button" class="secundario">Atualizar</button>
+      </div>
+      <div class="tabela-wrap">
+        <table>
+          <thead><tr><th>Funcionário</th><th>Cargo</th><th>Departamento</th><th>Salário</th><th>Anos</th><th>Bônus previsto</th><th>Ações</th></tr></thead>
+          <tbody id="lista-funcionarios"><tr><td colspan="7" class="vazio">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="painel">
+      <h2>Histórico de pagamentos de bônus</h2>
+      <p>O pagamento aparece aqui depois de clicar em “Gerar bônus”.</p>
+      <div class="tabela-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Funcionário</th><th>Data do pagamento</th><th>Valor</th></tr></thead>
+          <tbody id="lista-pagamentos"><tr><td colspan="4" class="vazio">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+    <footer>Projeto acadêmico • HTML, CSS, JavaScript, Node.js e MySQL</footer>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
