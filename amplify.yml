@@ -4,11 +4,11 @@ frontend:
   phases:
     preBuild:
       commands:
-        - cd sistema-rh-mysql && npm ci
+        - npm --prefix sistema-rh-mysql ci
 
     build:
       commands:
-        - cd sistema-rh-mysql && npm run amplify:bundle
+        - npm --prefix sistema-rh-mysql run amplify:bundle
 
   artifacts:
     baseDirectory: sistema-rh-mysql/.amplify-hosting
