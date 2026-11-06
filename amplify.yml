@@ -1,4 +1,4 @@
-cat > amplify.yml <<'YAML'
+
 version: 1
 
 frontend:
@@ -15,4 +15,3 @@ frontend:
     baseDirectory: sistema-rh-mysql/.amplify-hosting
     files:
       - '**/*'
-YAML
