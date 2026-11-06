@@ -7,16 +7,24 @@ const cors = require("cors");
 const app = express();
 const port = Number(process.env.PORT || 3000);
 
-app.use(cors());
+const allowedOrigins = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+if (allowedOrigins.length) app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-const db = mysql.createPool({
-  host: process.env.DB_HOST || "localhost",
+const dbConfigMissing = ["DB_HOST", "DB_NAME", "DB_USER", "DB_PASSWORD"]
+  .filter((key) => !process.env[key]);
+const db = dbConfigMissing.length ? null : mysql.createPool({
+  host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT || 3306),
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "empresa_rh",
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ...(process.env.DB_SSL === "true" ? { ssl: {} } : {}),
   waitForConnections: true,
   connectionLimit: 10,
   connectTimeout: 10000,
@@ -25,6 +33,13 @@ const db = mysql.createPool({
 
 // Diagnóstico: separa falha do servidor de falha na conexão com o MySQL.
 app.get("/api/health", async (_req, res) => {
+  if (!db) {
+    return res.status(503).json({
+      status: "error",
+      database: "not_configured",
+      missing: dbConfigMissing
+    });
+  }
   try {
     await db.query("SELECT 1");
     res.json({ status: "ok", database: "connected" });
