@@ -3,7 +3,9 @@ const express = require("express");
 const path = require("path");
 const mysql = require("mysql2/promise");
 
+const cors = require("cors");
 const app = express();
+app.use(cors());
 const port = process.env.PORT || 3000;
 
 const db = mysql.createPool({

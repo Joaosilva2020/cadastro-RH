@@ -4,6 +4,10 @@ const lista = $("lista-funcionarios");
 const pagamentos = $("lista-pagamentos");
 const mensagem = $("mensagem");
 
+// Deixe vazio se o front e o backend estiverem no mesmo servidor.
+// No Amplify, coloque a URL do backend, ex.: "https://seu-app.up.railway.app" (sem barra no final)
+const API = "";
+
 function avisar(texto, tipo = "") {
   mensagem.textContent = texto;
   mensagem.className = tipo;
@@ -18,7 +22,7 @@ function dataBR(data) {
 }
 
 async function carregarDepartamentos() {
-  const resposta = await fetch("/api/departamentos");
+  const resposta = await fetch(API + "/api/departamentos");
   const dados = await resposta.json();
   if (!resposta.ok) throw new Error(dados.erro);
   $("departamento").innerHTML = '<option value="">Selecione um departamento</option>';
@@ -32,7 +36,7 @@ async function carregarDepartamentos() {
 
 async function carregarFuncionarios() {
   try {
-    const resposta = await fetch("/api/funcionarios");
+    const resposta = await fetch(API + "/api/funcionarios");
     const pessoas = await resposta.json();
     if (!resposta.ok) throw new Error(pessoas.erro);
     lista.innerHTML = "";
@@ -65,7 +69,7 @@ async function carregarFuncionarios() {
 
 async function carregarPagamentos() {
   try {
-    const resposta = await fetch("/api/pagamentos");
+    const resposta = await fetch(API + "/api/pagamentos");
     const dados = await resposta.json();
     if (!resposta.ok) throw new Error(dados.erro);
     pagamentos.innerHTML = "";
@@ -119,7 +123,7 @@ form.addEventListener("submit", async (e) => {
   const botao = $("btn-salvar");
   botao.disabled = true;
   try {
-    const resposta = await fetch(id ? `/api/funcionarios/${id}` : "/api/funcionarios", {
+    const resposta = await fetch(id ? `${API}/api/funcionarios/${id}` : API + "/api/funcionarios", {
       method: id ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dados)
@@ -136,7 +140,7 @@ form.addEventListener("submit", async (e) => {
 async function gerarBonus(id, nome) {
   if (!confirm(`Registrar o bônus de ${nome}?`)) return;
   try {
-    const resposta = await fetch(`/api/bonus/${id}`, { method: "POST" });
+    const resposta = await fetch(`${API}/api/bonus/${id}`, { method: "POST" });
     const dados = await resposta.json();
     if (!resposta.ok) throw new Error(dados.erro);
     avisar(dados.mensagem, "sucesso");
@@ -147,7 +151,7 @@ async function gerarBonus(id, nome) {
 async function excluirFuncionario(id, nome) {
   if (!confirm(`Excluir ${nome}? Se houver pagamento registrado, o banco impedirá a exclusão.`)) return;
   try {
-    const resposta = await fetch(`/api/funcionarios/${id}`, { method: "DELETE" });
+    const resposta = await fetch(`${API}/api/funcionarios/${id}`, { method: "DELETE" });
     const dados = await resposta.json();
     if (!resposta.ok) throw new Error(dados.erro);
     avisar(dados.mensagem, "sucesso");
