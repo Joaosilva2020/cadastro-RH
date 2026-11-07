@@ -24,7 +24,7 @@ function dataBR(data) {
 async function carregarDepartamentos() {
   const resposta = await fetch(API + "/api/departamentos");
   const dados = await resposta.json();
-  if (!resposta.ok) throw new Error(dados.erro);
+  if (!resposta.ok) throw new Error(dados.code ? `${dados.erro} (${dados.code})` : dados.erro);
   $("departamento").innerHTML = '<option value="">Selecione um departamento</option>';
   dados.forEach(d => {
     const option = document.createElement("option");

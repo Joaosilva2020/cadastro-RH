@@ -66,8 +66,14 @@ app.get("/api/departamentos", async (_req, res) => {
     const [rows] = await db.query("SELECT * FROM departamentos ORDER BY nome_departamento");
     res.json(rows);
   } catch (error) {
-    console.error("Erro ao buscar departamentos:", error.code || error.message);
-    res.status(500).json({ erro: "Erro ao buscar departamentos. Confira a conexão e o banco de dados." });
+    const code = error.code || "DB_QUERY_ERROR";
+    console.error("Erro ao buscar departamentos:", code);
+    res.status(500).json({
+      erro: code === "ENOTFOUND"
+        ? "O endereço MySQL em DB_HOST não foi encontrado. Confira o host configurado."
+        : "Erro ao buscar departamentos. Confira a conexão, o usuário e o banco.",
+      code
+    });
   }
 });
 
@@ -78,7 +84,11 @@ app.get("/api/funcionarios", async (_req, res) => {
              DATE_FORMAT(f.data_admissao, '%Y-%m-%d') AS data_admissao,
              f.id_departamento, d.nome_departamento AS departamento,
              TIMESTAMPDIFF(YEAR, f.data_admissao, CURDATE()) AS anos_de_servico,
-             calcular_bonus(f.salario, TIMESTAMPDIFF(YEAR, f.data_admissao, CURDATE())) AS bonus_previsto
+             CASE
+               WHEN TIMESTAMPDIFF(YEAR, f.data_admissao, CURDATE()) < 5 THEN f.salario * 0.05
+               WHEN TIMESTAMPDIFF(YEAR, f.data_admissao, CURDATE()) <= 10 THEN f.salario * 0.10
+               ELSE f.salario * 0.15
+             END AS bonus_previsto
       FROM funcionarios AS f
       INNER JOIN departamentos AS d ON f.id_departamento = d.id_departamento
       ORDER BY f.id_funcionario DESC
@@ -86,7 +96,7 @@ app.get("/api/funcionarios", async (_req, res) => {
     res.json(rows);
   } catch (error) {
     console.error("Erro ao listar funcionários:", error.code || error.message);
-    res.status(500).json({ erro: "Erro ao listar funcionários. Verifique se executou database.sql e criou calcular_bonus." });
+    res.status(500).json({ erro: "Erro ao listar funcionários. Verifique se o schema database.sql foi criado." });
   }
 });
 
@@ -144,11 +154,22 @@ app.delete("/api/funcionarios/:id", async (req, res) => {
 
 app.post("/api/bonus/:id", async (req, res) => {
   try {
-    await db.execute("CALL gerar_bonus(?)", [req.params.id]);
+    const [result] = await db.execute(`
+      INSERT INTO pagamento_bonus (id_funcionario, data_pagamento, valor_bonus)
+      SELECT f.id_funcionario, CURDATE(),
+             CASE
+               WHEN TIMESTAMPDIFF(YEAR, f.data_admissao, CURDATE()) < 5 THEN f.salario * 0.05
+               WHEN TIMESTAMPDIFF(YEAR, f.data_admissao, CURDATE()) <= 10 THEN f.salario * 0.10
+               ELSE f.salario * 0.15
+             END
+      FROM funcionarios AS f
+      WHERE f.id_funcionario = ?
+    `, [req.params.id]);
+    if (!result.affectedRows) return res.status(404).json({ erro: "Funcionário não encontrado." });
     res.json({ mensagem: "Bônus registrado com sucesso." });
   } catch (error) {
     console.error("Erro ao gerar bônus:", error.code || error.message);
-    res.status(500).json({ erro: "Não foi possível registrar o bônus. Confira a procedure gerar_bonus." });
+    res.status(500).json({ erro: "Não foi possível registrar o bônus." });
   }
 });
 
